@@ -88,49 +88,48 @@ describe('PCO01 - ERC20 functions', () => {
             , /Error/);
     });
 
-    /*
-    it('who is owner', async () => {
-        let sendAmount = 10;
-        let owner = await inbox.methods.owner().call();
-        console.log('owner: ' + owner);
-        assert.equal('a', 'a');
-        //assert.equal(parseInt(balanceOwner), expTotalSupply-sendAmount);
-    });*/
-
-/*    it('try overspend 20 tokens from user1 to user2', async () => {
-        let sendAmount = 10;
-        await inbox.methods.transfer(accountUser1, sendAmount).send({ from: accountOwner });
-        const balanceUser1 = await inbox.methods.balanceOf(accountUser1).call();
-        const balanceOwner = await inbox.methods.balanceOf(accountOwner).call();
-        
-        assert.equal(parseInt(balanceUser1), sendAmount);
-        assert.equal(parseInt(balanceOwner), expTotalSupply-sendAmount);
-    });
-*/
 });
 
 
 describe('PCO01 - Burn', () => {
 
-    it('burn 1000 tokens', () => {
+    it('burn 1000 tokens', async () => {
+        let balanceBefore = await inbox.methods.balanceOf(accountOwner).call();
+        
         let amount = 1000;
         await inbox.methods.burn(amount).send({ from: accountOwner });
+
+        let balanceAfter = await inbox.methods.balanceOf(accountOwner).call();
+        
+        //check if right amount was burned
+        assert.equal(parseInt(balanceBefore), parseInt(balanceAfter)+amount);
     });
 
-    it('should fail: user1 burns 1000 tokens', () => {
-        let amount = 1000;
-        await inbox.methods.burn(amount).send({ from: accountUser1 });
+    it('should fail: user1 burns 1000 tokens (not allowed)', async () => {
+        let amount = '1000';
+        await assertThrowsAsync(async () => await inbox.methods.burn(amount).send({ from: accountUser1 })
+        , /Error/);
     });
 
-    it('should fail: burn more than available', () => {
-        let amount = 10000000000000001;
+
+    it('should fail: burn more than available', async () => {
+        //amount is string, as int can't hold that number (and arguments are sent as string anyway)
+        let amount = '10000000000000001';
+        
         await assertThrowsAsync(async () => await inbox.methods.burn(amount).send({ from: accountOwner })
             , /Error/);
+
+        let balanceBefore = await inbox.methods.balanceOf(accountOwner).call();
+
     });
+});
 
 
+describe('PCO01 - LockUp', () => {
 
-
+    it('lock up ....', async () => {
+        //todo
+    });
 });
 
 
