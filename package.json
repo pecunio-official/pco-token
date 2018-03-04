@@ -12,6 +12,7 @@
     "fs": "0.0.1-security",
     "ganache-cli": "^6.0.3",
     "mocha": "^5.0.1",
+    "moment": "^2.21.0",
     "path": "^0.12.7",
     "solc": "^0.4.20",
     "truffle-hdwallet-provider": "0.0.3",
