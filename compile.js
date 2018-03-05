@@ -24,14 +24,18 @@ function findImports (pathName) {
 
 
 function compile(filename, contractName) {
-    const inboxPath = path.resolve(__dirname, 'contracts', filename);
+/*    const inboxPath = path.resolve(__dirname, 'contracts', filename);
     const source = fs.readFileSync(inboxPath, 'utf8');
-    return solc.compile(source, 1).contracts[':' + contractName];
-    /*const source = findContract(filename);
-    return solc.compile({
-            sources: { 'PCO01': source }
-        }, 1, findImports);
-    */}
+    let res = solc.compile(source, 1);
+    //.contracts[':' + contractName];
+    return res;*/
+   
+    const source = findContract(filename);
+    let res = solc.compile({
+            sources: { 'PCO': source }
+        }, 1, findImports)
+    return res.contracts[contractName + ':' + contractName];;
+}
 
 module.exports = {
     compile: compile

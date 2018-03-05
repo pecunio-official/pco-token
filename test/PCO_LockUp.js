@@ -73,7 +73,8 @@ describe('PCO Token - LockUp', () => {
         assert.equal(parseInt(balanceUser2), parseInt(amountUnlocked));
     });
 
-    /*it('test if coins unlocked after lock up over', async () => {
+    /*
+    it('test if coins unlocked after lock up over', async () => {
         let amountLocked = 1000;
         
         //calculate unix timestamp of in 2 days
