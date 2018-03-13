@@ -77,7 +77,7 @@ describe('PCO Token - LockUp', () => {
     });
 
 
-    it('send 100 coins locked for 1 day and release when releasable', async () => {
+  /*  it('send 100 coins locked for 1 day and release when releasable', async () => {
         let amountLocked = 1000;
 
         //calculate unix timestamp of in 2 days
@@ -110,7 +110,7 @@ describe('PCO Token - LockUp', () => {
         let balanceUser1Unlocked = await inbox.methods.balanceOf(accountUser1).call();
         assert.equal(parseInt(balanceUser1Unlocked), amountLocked);
     });
-
+*/
 });
 
 

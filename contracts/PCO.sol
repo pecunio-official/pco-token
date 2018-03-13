@@ -5,6 +5,7 @@ pragma solidity ^0.4.18;
 import "./zeppelin/token/ERC20/BurnableToken.sol";
 import "./zeppelin/token/ERC20/ERC20.sol";
 import "./zeppelin/token/ERC20/BasicToken.sol";
+import "./zeppelin/token/ERC20/StandardToken.sol";
 import "./zeppelin/token/ERC20/TokenTimelock.sol";
 import "./zeppelin/ownership/Ownable.sol";
 
@@ -13,9 +14,9 @@ import "./zeppelin/ownership/Ownable.sol";
  * Features:
  *  - ERC20 compliant
  *  - Lock-Up with variable time/amount (owner only)
- *  - Burn with variable amount (owner only)
+ *  - Burn with variable amount (anyone)
  */
-contract PCO is BurnableToken, Ownable { 
+contract PCO is StandardToken, BurnableToken, Ownable { 
     
     // Public variables of the token
     string public constant symbol = "PCO";
