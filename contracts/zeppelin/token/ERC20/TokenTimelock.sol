@@ -31,7 +31,7 @@ contract TokenTimelock {
    * @notice Transfers tokens held by timelock to beneficiary.
    */
   function release() public {
-    require(now >= (releaseTime-100000));
+    require(now >= releaseTime);
 
     uint256 amount = token.balanceOf(this);
     require(amount > 0);
