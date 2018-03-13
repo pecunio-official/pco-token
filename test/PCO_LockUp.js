@@ -4,13 +4,14 @@ const Web3 = require('web3');
 const Compiler = require('../compile');
 const moment = require('moment');
 const sleep = require('await-sleep');
-
+const CircularJSON = require('circular-json')
 
 const provider = ganache.provider();
 const web3 = new Web3(provider); 
 
-const { interface, bytecode } = Compiler.compile('PCO.sol', 'PCO');
- 
+const compiledContract = Compiler.compile('PCO.sol');
+const { interface, bytecode } = compiledContract['PCO:PCO'];
+const tokenTimelockABI = compiledContract['zeppelin/token/ERC20/TokenTimelock.sol:TokenTimelock'].interface;
 
 let accounts,
     inbox;
@@ -38,7 +39,7 @@ beforeEach(async () => {
  
 describe('PCO Token - LockUp', () => {
 
-    it('send 100 coins locked for 2 days and try to spend prematurely', async () => {
+    it('send 100 coins locked for 2 days and try to release prematurely', async () => {
         let amountLocked = 1000;
         let amountUnlocked = 100;
 
@@ -50,91 +51,69 @@ describe('PCO Token - LockUp', () => {
             .send({ from: accountOwner, gas: '6000000' });
 
         //send locked coins to user1 with 2 day lock
-        await inbox.methods.transferWithTimeLock(accountUser1, amountLocked, in2days)
+        let timeLockAddress = await inbox.methods.transferWithTimeLock(accountUser1, amountLocked, in2days)
             .send({ from: accountOwner, gas: '6000000' });
 
-        let {lockedBalance, balance} = await getAllBalances(accountUser1);
+        //check if unlocked blance is correct
+        let balanceUser1Unlocked = await inbox.methods.balanceOf(accountUser1).call();
+        assert.equal(parseInt(balanceUser1Unlocked), amountUnlocked);
+
+        //check if locked blance is correct
+        let balanceUser1Locked = await inbox.methods.balanceOf(timeLockAddress.events.Transfer.returnValues.to).call();
+        assert.equal(parseInt(balanceUser1Locked), amountLocked);
+
+        //access TokenTimelock contract
+        let timeLockContractUser1 = await new web3.eth.Contract(
+            JSON.parse(tokenTimelockABI), 
+            timeLockAddress.events.Transfer.returnValues.to);        
         
-        //check if locked amount is equal to sent amount
-        assert.equal(balance - amountUnlocked, lockedBalance.sum);
+        //make sure beneficiary is correct
+        let beneficiary =  await timeLockContractUser1.methods.beneficiary().call();
+        assert.equal(beneficiary, accountUser1)
 
-        //try to send unlockedAmount+1 to user2 (should fail)
-        await assertThrowsAsync(async () => await inbox.methods.transfer(accountUser2, amountUnlocked+1)
-            .send({ from: accountUser1, gas: '6000000' })
+        //try to prematurely release - should fail
+        await assertThrowsAsync(async () => await timeLockContractUser1.methods.release().call()
             , /Error/);
-
-        //try to send unlocked amount to user2 (should work)
-        await inbox.methods.transfer(accountUser2, amountUnlocked)
-            .send({ from: accountUser1, gas: '6000000' })
-
-        let balanceUser2 = await inbox.methods.balanceOf(accountUser2).call();
-        await sleep(300);
-
-        assert.equal(parseInt(balanceUser2), parseInt(amountUnlocked));
     });
 
-    /*
-    it('test if coins unlocked after lock up over', async () => {
+
+    it('send 100 coins locked for 1 day and release when releasable', async () => {
         let amountLocked = 1000;
-        
+
         //calculate unix timestamp of in 2 days
-        var in2days = moment().add(1, 'seconds').format('X');
-        
+        var in1day = moment().add(1, 'day').format('X');
+
         //send locked coins to user1 with 2 day lock
-        await inbox.methods.transferWithTimeLock(accountUser1, amountLocked, in2days)
+        let timeLockAddress = await inbox.methods.transferWithTimeLock(accountUser1, amountLocked, in1day)
             .send({ from: accountOwner, gas: '6000000' });
 
-        let {lockedBalance, balance} = await getAllBalances(accountUser1);
+        //check if locked blance is correct
+        let balanceUser1Locked = await inbox.methods.balanceOf(timeLockAddress.events.Transfer.returnValues.to).call();
+        assert.equal(parseInt(balanceUser1Locked), amountLocked);
 
-        //check if locked amount is equal to sent amount
-        assert.equal(amountLocked, lockedBalance.sum);
-        assert.equal(amountLocked, balance);
-
-        //try to send the locked amount to user2 (should fail)
-        await assertThrowsAsync(async () => await inbox.methods.transfer(accountUser2, amountLocked)
-            .send({ from: accountUser1, gas: '6000000' })
-            , /Error/);
-
-        await sleep(1200);
-
-        //try to send unlocked amount to user2 (should work)
-        await inbox.methods.transfer(accountUser2, amountLocked)
-            .send({ from: accountUser1, gas: '6000000' })
-
-        let balanceUser1 = await inbox.methods.balanceOf(accountUser1).call();
-        let balanceUser2 = await inbox.methods.balanceOf(accountUser2).call();
-
-        //check if user 2 received the tokens
-        assert.equal(parseInt(balanceUser2), parseInt(amountLocked));
+        //access TokenTimelock contract
+        let timeLockContractUser1 = await new web3.eth.Contract(
+            JSON.parse(tokenTimelockABI), 
+            timeLockAddress.events.Transfer.returnValues.to);        
         
+        //make sure beneficiary is correct
+        let beneficiary =  await timeLockContractUser1.methods.beneficiary().call();
+        assert.equal(beneficiary, accountUser1)
 
-        let {lockedBalanceU1, balanceU1} = await getAllBalances(accountUser1);
-console.log(JSON.stringify(lockedBalanceU1));
+        //release
+        await timeLockContractUser1.methods.release().call();
 
-        //check that locked balance is 0
-        assert.equal(parseInt(lockedBalanceU1.sum), 0);
+        //make sure, we are past the release time
+        await sleep(200);
 
-        //check that total  balance is 0
-        assert.equal(parseInt(balanceU1), 0);
-        
-    });*/
+        //check if tokens are released correctly and an the beneficiaries account
+        let balanceUser1Unlocked = await inbox.methods.balanceOf(accountUser1).call();
+        assert.equal(parseInt(balanceUser1Unlocked), amountLocked);
+    });
 
 });
 
 
-/**
- * Helper function to get locked and total balance
- * @param {address} user 
- */
-async function getAllBalances(user) {
-    //get locked balance
-    let lockedBalance = await inbox.methods.lockedBalanceOf(user).call();
-
-    //get total balance (includes locked balance)
-    let balance = await inbox.methods.balanceOf(user).call();
-
-    return { lockedBalance:lockedBalance, balance:balance};
-}  
 
 /**
  * Helper function for async exceptions

@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "await-sleep": "0.0.1",
+    "circular-json": "^0.5.1",
     "fs": "0.0.1-security",
     "ganache-cli": "^6.0.3",
     "mocha": "^5.0.1",

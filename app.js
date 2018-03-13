@@ -1,1 +1,1 @@
-require('./test/PCO_burn');
+require('./test/PCO_LockUp');

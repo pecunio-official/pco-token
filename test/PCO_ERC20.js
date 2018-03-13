@@ -33,7 +33,7 @@ beforeEach(async () => {
     
     inbox.setProvider(provider);
 });
- 
+
 describe('PCO - ERC20 functions', () => {
 
     it('deploys a contract', () => {
@@ -89,8 +89,6 @@ describe('PCO - ERC20 functions', () => {
     });
 
 });
-
-
 
 /**
  * Helper function for async exceptions

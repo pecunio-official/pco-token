@@ -34,8 +34,13 @@ function compile(filename, contractName) {
     let res = solc.compile({
             sources: { 'PCO': source }
         }, 1, findImports)
-    return res.contracts[contractName + ':' + contractName];;
+
+    if (contractName===undefined)
+        return res.contracts;
+        
+    return res.contracts[contractName + ':' + contractName];
 }
+
 
 module.exports = {
     compile: compile
