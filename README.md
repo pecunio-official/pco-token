@@ -18,12 +18,11 @@ Install with
 $ cd pco-token
 $ npm install
 ```
-To test the token (currently on local test network wit [Ganache]). When you run the test, it is automatically deployed an run:
+To test the token (currently on local test network with [Ganache]). When you run the test, it is automatically deployed an run:
 
 ```sh
 $ npm run test
 ```
-
 
 
 ## Authors

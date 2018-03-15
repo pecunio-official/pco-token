@@ -22,8 +22,8 @@ contract PCO is StandardToken, BurnableToken, Ownable {
     string public constant symbol = "PCO";
     string public constant name =  "Pecunio";
     
-    uint8 public constant DECIMALS = 8;
-
+    uint8 public constant decimals = 8;
+    
     // 100.000.000 tokens + 8 DECIMALS = 10^16 units 
     uint256 public constant INITIAL_SUPPLY = 10000000000000000;
 

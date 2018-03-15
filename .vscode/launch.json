@@ -6,6 +6,16 @@
     "configurations": [
         {
             "type": "node",
+            "request": "launch",
+            "name": "Launch pco.js",
+            "program": "${workspaceFolder}/pco.js",
+            "args": [
+                "-a", "0x6a1Be2A7CA233fB30e731435b0cD6c5186248Cc5", "-b", "0x04FFf97025d0F138dC1Eaa62078e78255e1bd192"
+            ]
+
+        },
+        {
+            "type": "node",
             "request": "attach",
             "name": "Attach",
             "port": 9229,

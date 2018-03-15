@@ -8,6 +8,7 @@
  - Decimals: 8
  - Maximum number of units: 10.000.000.000.000.000
  - Token Standard: ERC20
+ - Libraries used: Zeppelin, based on commit
  - Additional features:
     - Lock up: Send tokens locked (only contract owner)
     - Burn: Reduce total amount of tokens (only contract owner)

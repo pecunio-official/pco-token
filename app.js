@@ -1,1 +1,1 @@
-require('./test/PCO_LockUp');
+require('./test/PCO_ERC20');
