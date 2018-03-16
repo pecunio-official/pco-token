@@ -8,20 +8,20 @@
  - Decimals: 8
  - Maximum number of units: 10.000.000.000.000.000
  - Token Standard: ERC20
- - Libraries used: Zeppelin, based on commit
+ - Libraries used: Zeppelin, based on commit 108d5f3b4a70aae48ee6666123dab2d4046ffbeb (Feb 16, 2018)
  - Additional features:
-    - Lock up: Send tokens locked (only contract owner)
-    - Burn: Reduce total amount of tokens (only contract owner)
+    - Lock up: Send tokens locked using TokenTimelock contract from Zeppelin
+    - Burn: Reduce total amount of tokens using BurnableToken from Zeppelin
 
-### ERC20
-*TODO*
 
 ### Burn
+The burn mechanism uses the standard implementation of Zeppelin. The amount to burn is subtracted from the burners account as well as from the total supply. 
 ```javascript
 /**
- * Burns the amount _value from the contract owners account. Only the contract owner can call this function.
+ * @dev Burns a specific amount of tokens.
+ * @param _value The amount of token to be burned.
  */
-function burn(uint256 _value) public ownerOnly returns (bool success)
+function burn(uint256 _value) public
 
 /**
  * The event Burn is called after burn() is run to inform UI/clients 
@@ -31,8 +31,4 @@ event Burn(address indexed from, uint256 value);
 
 
 ### Lock-Up
-Tokens can be sent with a time lock from the contract owner. The contract stores a conventional balance mapping with the total balances of the users and a separate list with the locked balances of the users. 
-```quote
-balanceOf[user] == balanceUnlocked[user] + balanceLocked[user]
-```
-This was implemented this way to guarantee compatibility with the ERC20 standard. The balanceOf() function thus always returns the entire balance of a user - the locked balance can be retrieved with lockedBalanceOf() function. 
+For the lock-up, a TokenTimelock contract is created that holds the tokens until the release time. To release the tokens, the release() function has to be triggered manually. The locked balance of a user will not show up on his balance until the locked amount is released.

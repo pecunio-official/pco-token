@@ -47,7 +47,7 @@ describe('PCO - ERC20 functions', () => {
     });
     
     it('has a default decimals of 8', async () => {
-        const message = await inbox.methods.DECIMALS().call();
+        const message = await inbox.methods.decimals().call();
         assert.equal(message, 8);
     });
 

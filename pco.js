@@ -25,13 +25,11 @@ let tokenTimelockABI;
         .usage('')
         .option('-p, --production', 'Use production environment. Configurable in config.json')
         .option('-d, --deploy', 'Deploys the token to the selected network')
-        .option('-a, --access [contract address]', 'Access existing PCO contract at address')
-        .option('-s, --send [address]', 'Send funds to user')
-        .option('-l, --sendLocked [address]', 'Send funds locked')
-        .option('-r, --releaseLocked [address]', 'Release locked funds')
-        .option('-b, --balanceOf [address]')
-        //.option('-c, --cheese [type]', 'Add the specified type of cheese [marble]', 'marble')
-        .option('-s')
+        //.option('-a, --access [contract address]', 'Access existing PCO contract at address')
+        //.option('-s, --send [address]', 'Send funds to user')
+        //.option('-l, --sendLocked [address]', 'Send funds locked')
+        //.option('-r, --releaseLocked [address]', 'Release locked funds')
+        //.option('-b, --balanceOf [address]')
         .parse(process.argv);
 
     // verify base data correct
@@ -55,7 +53,6 @@ let tokenTimelockABI;
     if (program.balanceOf) {
         let balance = await balanceOf(program.balanceOf);
         console.log ('balance of %s is %s', program.balanceOf, balance);
-        
     }
 
     
@@ -138,10 +135,4 @@ async function deploy() {
 async function accessContract(contractAddress) {
     console.log('Accessing contract...')
     contract = await new web3.eth.Contract(JSON.parse(pcoABI), contractAddress);
-}
-
-
-async function balanceOf(account) {
-    let bal = await contract.methods.balanceOf('0x04FFf97025d0F138dC1Eaa62078e78255e1bd192').call();
-    return bal;
 }

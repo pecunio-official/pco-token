@@ -36,9 +36,8 @@ contract PCO is StandardToken, BurnableToken, Ownable {
         Transfer(0x0, msg.sender, INITIAL_SUPPLY);
     }
 
-    function transferWithTimeLock(address _to, uint256 _amount, uint256 _releaseTime) onlyOwner returns (TokenTimelock) {
+    function transferWithTimeLock(address _to, uint256 _amount, uint256 _releaseTime) onlyOwner {
         TokenTimelock timelock = new TokenTimelock(this, _to, _releaseTime);
         transfer(timelock, _amount);
-        return timelock;
     }
 }
